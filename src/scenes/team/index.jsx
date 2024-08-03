@@ -1,76 +1,67 @@
 import { Box, Typography, useTheme } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataTeam } from "../../data/mockData";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
+import { useEffect, useState } from "react";
+const addSequentialIds = (data) => {
+  if (data) {
+    console.log("in");
+    return data.map((item, index) => ({
+      ...item,
+      id: index + 1, // Sequential IDs starting from 1
+    }));
+  }
+};
 
-const Team = () => {
+const Team = ({ data }) => {
+  const [storeData, setStoredData] = useState();
+  useEffect(() => {
+    const transformedData = addSequentialIds(data);
+    setStoredData(transformedData);
+    console.log("I am transformed data");
+    console.log(transformedData);
+  }, [data]);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const columns = [
     { field: "id", headerName: "ID" },
     {
-      field: "name",
-      headerName: "Name",
+      field: "sector",
+      headerName: "Sector",
       flex: 1,
       cellClassName: "name-column--cell",
     },
     {
-      field: "age",
-      headerName: "Age",
+      field: "intensity",
+      headerName: "Intensity",
       type: "number",
       headerAlign: "left",
       align: "left",
     },
     {
-      field: "phone",
-      headerName: "Phone Number",
+      field: "topic",
+      headerName: "Topic",
       flex: 1,
     },
     {
-      field: "email",
-      headerName: "Email",
+      field: "region",
+      headerName: "Region",
       flex: 1,
     },
     {
-      field: "accessLevel",
-      headerName: "Access Level",
+      field: "published",
+      headerName: "Published on",
       flex: 1,
-      renderCell: ({ row: { access } }) => {
-        return (
-          <Box
-            width="60%"
-            m="0 auto"
-            p="5px"
-            display="flex"
-            justifyContent="center"
-            backgroundColor={
-              access === "admin"
-                ? colors.greenAccent[600]
-                : access === "manager"
-                ? colors.greenAccent[700]
-                : colors.greenAccent[700]
-            }
-            borderRadius="4px"
-          >
-            {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
-            {access === "manager" && <SecurityOutlinedIcon />}
-            {access === "user" && <LockOpenOutlinedIcon />}
-            <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
-              {access}
-            </Typography>
-          </Box>
-        );
-      },
     },
+    
   ];
 
   return (
     <Box m="20px">
-      <Header title="TEAM" subtitle="Managing the Team Members" />
+      <Header title="DATA" subtitle="Entire Stored Data" />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -98,9 +89,22 @@ const Team = () => {
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
           },
+          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+            color: `${colors.grey[100]} !important`,
+          },
         }}
       >
-        <DataGrid checkboxSelection rows={mockDataTeam} columns={columns} />
+        {storeData ? (
+          <DataGrid
+            checkboxSelection
+            rows={storeData}
+            columns={columns}
+            getRowId={(row) => row._id}
+            components={{ Toolbar: GridToolbar }}
+          />
+        ) : (
+          <></>
+        )}
       </Box>
     </Box>
   );

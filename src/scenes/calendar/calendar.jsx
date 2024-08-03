@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FullCalendar, { formatDate } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -20,19 +20,61 @@ const Calendar = () => {
   const colors = tokens(theme.palette.mode);
   const [currentEvents, setCurrentEvents] = useState([]);
 
+  useEffect(() => {
+    const localStorageEvents = JSON.parse(localStorage.getItem('calendarEvents'));
+
+    if (!localStorageEvents || localStorageEvents.length === 0) {
+      // Default events to populate local storage
+      const defaultEvents = [
+        {
+          id: "12315",
+          title: "All-day event",
+          start: "2024-07-27",
+          end: "2024-07-27",
+          allDay: true,
+        },
+        {
+          id: "5123",
+          title: "Timed event",
+          start: "2024-07-29T10:00:00",
+          end: "2024-07-29T12:00:00",
+          allDay: false,
+        },
+      ];
+
+      localStorage.setItem('calendarEvents', JSON.stringify(defaultEvents));
+      setCurrentEvents(defaultEvents);
+    } else {
+      setCurrentEvents(localStorageEvents);
+    }
+  }, []);
+
   const handleDateClick = (selected) => {
     const title = prompt("Please enter a new title for your event");
     const calendarApi = selected.view.calendar;
     calendarApi.unselect();
 
     if (title) {
-      calendarApi.addEvent({
+      const newEvent = {
         id: `${selected.dateStr}-${title}`,
         title,
         start: selected.startStr,
         end: selected.endStr,
         allDay: selected.allDay,
-      });
+      };
+
+      // Add event to calendar
+      calendarApi.addEvent(newEvent);
+
+      // Retrieve existing events and add the new one
+      const existingEvents = JSON.parse(localStorage.getItem('calendarEvents')) || [];
+      if (!existingEvents.some(event => event.id === newEvent.id)) {
+        existingEvents.push(newEvent);
+        localStorage.setItem('calendarEvents', JSON.stringify(existingEvents));
+      }
+
+      // Update currentEvents state
+      setCurrentEvents(existingEvents);
     }
   };
 
@@ -42,7 +84,16 @@ const Calendar = () => {
         `Are you sure you want to delete the event '${selected.event.title}'`
       )
     ) {
+      // Remove event from calendar
       selected.event.remove();
+
+      // Remove event from local storage
+      let events = JSON.parse(localStorage.getItem('calendarEvents')) || [];
+      events = events.filter(event => event.id !== selected.event.id);
+      localStorage.setItem('calendarEvents', JSON.stringify(events));
+
+      // Update currentEvents state
+      setCurrentEvents(events);
     }
   };
 
@@ -109,18 +160,7 @@ const Calendar = () => {
             select={handleDateClick}
             eventClick={handleEventClick}
             eventsSet={(events) => setCurrentEvents(events)}
-            initialEvents={[
-              {
-                id: "12315",
-                title: "All-day event",
-                date: "2022-09-14",
-              },
-              {
-                id: "5123",
-                title: "Timed event",
-                date: "2022-09-28",
-              },
-            ]}
+            initialEvents={JSON.parse(localStorage.getItem('calendarEvents')) || []}
           />
         </Box>
       </Box>
