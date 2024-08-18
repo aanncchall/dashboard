@@ -17,7 +17,7 @@ const Form = ({mngreload}) => {
     formValues = values;
     console.log(formValues);
     try {
-      const response = await axios.post('http://localhost:3300/api/data', formValues);
+      const response = await axios.post('https://lokhand-server.onrender.com/api/data', formValues);
       console.log('Data saved:', response.data);
       // Clear the form or handle successful submission
       alert("Your Data is Saved Successfully");

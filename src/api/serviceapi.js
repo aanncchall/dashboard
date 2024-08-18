@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3300/api/data';
+const API_URL = 'https://lokhand-server.onrender.com/api/data';
 
 const getData = async () => {
     try {

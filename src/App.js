@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
@@ -20,26 +20,31 @@ function App() {
   const [isSidebar, setIsSidebar] = useState(true);
   const [data, setData] = useState([]);
   const [reload, setReload] = useState(false);
+  const isFirstRender = useRef(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await getData();
-                setData(result);
-                // console.log(result);
-            } catch (error) {
-                console.error('Error fetching data', error);
-            }
-        };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getData();
+        setData(result);
+        // console.log(result);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
 
-        fetchData();
-        setReload(false);
-        // console.log(data);
-    }, [reload]);
+    fetchData();
+    if (isFirstRender.current) {
+      alert("It may take few seconds to fetch updated data, Please wait :)");
+      isFirstRender.current = false;
+  }
+    setReload(false);
+    // console.log(data);
+  }, [reload]);
 
-    const manageReLoad = ()=>{
-      setReload(true);
-    }
+  const manageReLoad = () => {
+    setReload(true);
+  };
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -50,9 +55,12 @@ function App() {
           <main className="content">
             <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
-              <Route path="/" element={<Dashboard data={data} mngreload={manageReLoad} />} />
+              <Route
+                path="/"
+                element={<Dashboard data={data} mngreload={manageReLoad} />}
+              />
               <Route path="/team" element={<Team data={data} />} />
-              <Route path="/form" element={<Form mngreload={manageReLoad}/>} />
+              <Route path="/form" element={<Form mngreload={manageReLoad} />} />
               <Route path="/bar" element={<Bar data={data} />} />
               <Route path="/pie" element={<Pie data={data} />} />
               <Route path="/line" element={<Line data={data} />} />

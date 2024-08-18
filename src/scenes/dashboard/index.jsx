@@ -453,7 +453,7 @@ const Dashboard = ({ data, mngreload }) => {
         {/* Geography chart  */}
         <Box
           gridColumn="span 12"
-          gridRow="span 5"
+          gridRow="span 6"
           backgroundColor={colors.primary[400]}
           p="30px"
         >
