@@ -3,7 +3,7 @@ import { useTheme } from "@mui/material";
 import { ResponsiveChoropleth } from "@nivo/geo";
 import { geoFeatures } from "../data/mockGeoFeatures";
 import { tokens } from "../theme";
-import { scaleQuantize } from "d3-scale";
+// import { scaleQuantize } from "d3-scale";
 
 // Mapping of country names to country codes
 const countryCodeMap = {
